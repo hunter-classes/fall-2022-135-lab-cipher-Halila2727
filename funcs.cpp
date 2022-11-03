@@ -1,4 +1,8 @@
 #include <iostream>
+#include <cfloat>
+#include <cmath>
+#include <vector>
+#include <cfloat>
 #include "funcs.h"
 
 // A helper function to shift one character by rshift
@@ -56,6 +60,7 @@ std::string encryptCaesar(std::string plaintext, int rshift)
     return s;
 }
 
+// Caesar cipher decryption
 std::string decryptCaesar(std::string ciphertext, int rshift)
 {
     int newShift = 0;
@@ -81,3 +86,97 @@ std::string decryptCaesar(std::string ciphertext, int rshift)
     return s;
 }
 
+//find distance
+double distance(std::vector<double> engFreq, std::vector<double> wordFreq)
+{
+    double d = 0.0;
+
+    for(int i = 0; i < 26; i++)
+    {
+        d += (engFreq[i] - wordFreq[i])*(engFreq[i] - wordFreq[i]);
+    }
+    d = sqrt(d);
+    
+    return d;
+}
+
+int letterIndex(char c)
+{
+    int lowerLetters[26] = {'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z'};
+    int upperLetters[26] = {'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z'};
+    
+    for(int j = 0; j < 26; j++)
+    {
+        if(isupper(c))
+        {
+            if(c == upperLetters[j])
+            {
+                return j;
+            }
+
+        }
+
+        else
+        {
+            if(c == lowerLetters[j])
+            {
+                return j;
+            }
+        }
+    }
+    return 40; //for non-letters
+}
+
+std::string solve(std::string encrypted_string)
+{
+    std::string shifted_strings[26];
+    std::vector<double> englishFrequencies = {0.082, 0.015, 0.027, 0.047, 0.13, 0.022, 0.02, 0.062, 0.069, 0.0016, 
+                                                0.0081, 0.04, 0.027, 0.067, 0.078, 0.019, 0.0011, 0.059, 0.062, 
+                                                0.096, 0.027, 0.0097, 0.024, 0.0015, 0.02, 0.0078};
+    std::vector<double> letterFrequencies = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 
+                                            0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
+
+    int numLetters = 0;
+    int index = 0;
+    double min = DBL_MAX;
+    double mins[26];
+    int currIndex = 0;
+    int minIndex = 0;
+
+    for(int i=0; i<26; i++)
+    {
+        for(int j=0; j<encrypted_string.length(); j++)
+        {
+            if(isalpha(encrypted_string[j])) //excluding special characters
+            {
+                index = letterIndex(encrypted_string[j]);
+                letterFrequencies[index] += 1;
+                numLetters++;
+            }
+        }
+
+        for(int k=0; k<26; k++)
+        {
+            letterFrequencies[k] = letterFrequencies[k] / numLetters;
+        }
+
+        if(distance(englishFrequencies, letterFrequencies) < min)
+        {
+            min = distance(englishFrequencies, letterFrequencies);
+            mins[currIndex] = min;
+            shifted_strings[currIndex] = encrypted_string;
+        }
+         encrypted_string = encryptCaesar(encrypted_string, 1);
+    }
+
+    for(int p = 0; p < 26; p++)
+    {
+        if(min == mins[p])
+        {
+            minIndex = p;
+        }
+    }
+
+    return shifted_strings[minIndex];
+    return "";
+}
