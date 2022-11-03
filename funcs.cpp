@@ -124,7 +124,21 @@ int letterIndex(char c)
             }
         }
     }
-    return 40; //for non-letters
+    return 26; //for non-letters
+}
+
+int phraseLetters(std::string s)
+{
+    int num = 0;
+
+    for(int j=0; j<s.length(); j++)
+    {
+        if(isalpha(s[j])) //excluding special characters
+        {
+            num++;
+        }
+    }
+    return num;
 }
 
 std::string solve(std::string encrypted_string)
@@ -136,7 +150,7 @@ std::string solve(std::string encrypted_string)
     std::vector<double> letterFrequencies = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 
                                             0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
 
-    int numLetters = 0;
+    int numLetters = phraseLetters(encrypted_string);
     int index = 0;
     double min = DBL_MAX;
     double mins[26];
@@ -150,8 +164,7 @@ std::string solve(std::string encrypted_string)
             if(isalpha(encrypted_string[j])) //excluding special characters
             {
                 index = letterIndex(encrypted_string[j]);
-                letterFrequencies[index] += 1;
-                numLetters++;
+                letterFrequencies[index] += 1.0;
             }
         }
 
@@ -165,6 +178,7 @@ std::string solve(std::string encrypted_string)
             min = distance(englishFrequencies, letterFrequencies);
             mins[currIndex] = min;
             shifted_strings[currIndex] = encrypted_string;
+            currIndex++;
         }
          encrypted_string = encryptCaesar(encrypted_string, 1);
     }
